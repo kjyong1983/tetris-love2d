@@ -29,8 +29,15 @@ function game:load()
     block = {x = 0, y = 0, val = 1}
     active = true
     
-    block1 = {block.x - 2, block.x - 1, block.x, block.x + 1}
-
+    blocks = {tetI, tetO}
+    
+    tetI = {x = 0, y = 0, val = 1, {x = block.x-2, y = block.y}, {x = block.x-1, y = block.y}, {x = block.x, y = block.y}, {x = block.x+1, y = block.y}}
+    tetO = {x = 0, y = 0, val = 1, {x = block.x, y = block.y}, {x = block.x+1, y = block.y}, {x = block.x, y = block.y+1}, {x = block.x+1, y = block.y+1}}
+    tetJ = {}
+    tetL = {}
+    tetS = {}
+    tetZ = {}
+    tetT = {}
     
     block.x, block.y = startLoc.x, startLoc.y
     map[block.x][block.y].val = block.val
@@ -56,12 +63,10 @@ function game:update(dt)
     if active == false then
         block.x, block.y = startLoc.x, startLoc.y
         game:checkLine()
+        --block = game:getRandomBlock()
         active = true
     end
-    
-    
-    
-    
+        
 end
 
 function game:draw()
@@ -117,8 +122,17 @@ function love.keypressed(key)
     
 end
 --]]
+
 function game:getRandomBlock()
-    num = love.math.random(7)
+    num = love.math.random(#blocks)
+    block = blocks[num]
+    print(block)
+end
+
+function game:setBlock()
+    for i = 4, #block do
+        map[block[i].x][block[i].y].val = 1
+    end
 end
 
 function game:moveCheck(i)
@@ -219,13 +233,11 @@ function game:eraseLine(j)
         for k = j, minH + 1, -1 do
             map[i][k].val = map[i][k-1].val
         end
-    end
-    
-    
+    end    
 end
 
 function game:rotate()
-
+    print 'rotate'
 end
 
 return game
