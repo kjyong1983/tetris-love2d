@@ -25,22 +25,36 @@ function game:load()
     end
     
     startLoc = {x = 4, y = 1}
+    active = false
     
-    block = {x = 0, y = 0, val = 1}
-    active = true
-    
-    blocks = {tetI, tetO}
-    
-    tetI = {x = 0, y = 0, val = 1, {x = block.x-2, y = block.y}, {x = block.x-1, y = block.y}, {x = block.x, y = block.y}, {x = block.x+1, y = block.y}}
+    --block = {x = 0, y = 0, val = 1}
+    block = 
+    {
+    x = {0,0,0,0,0,0},
+    y = {0,0,0,0,0,0}
+    }
+--    blocks = {}
+    b1 = {x = -1}
+    b1 = {}
+    b2 = {}
+    b3 = {}
+    b4 = {}
+    b5 = {}
+    b6 = {}
+    blocks = {tetI}
+    tetI = {{-2,-1,0,1},{0,0,0,0}}
+--[[     
+   
+    tetI = {{x = block.x-2, y = block.y}, {x = block.x-1, y = block.y}, {x = block.x, y = block.y}, {x = block.x+1, y = block.y}}
     tetO = {x = 0, y = 0, val = 1, {x = block.x, y = block.y}, {x = block.x+1, y = block.y}, {x = block.x, y = block.y+1}, {x = block.x+1, y = block.y+1}}
     tetJ = {}
     tetL = {}
     tetS = {}
     tetZ = {}
     tetT = {}
-    
-    block.x, block.y = startLoc.x, startLoc.y
-    map[block.x][block.y].val = block.val
+--]]
+    --block.x, block.y = startLoc.x, startLoc.y
+    --map[block.x][block.y].val = block.val
     --map[4][6].val = 1
     
     --print 'love.load'
@@ -53,17 +67,17 @@ function game:update(dt)
     --print (elapsedTime)
     if elapsedTime > timeUnit then
         --print '1sec'
-        if game:moveCheckDown() then
-            game:moveDown()
+--        if game:moveCheckDown() then
+--            game:moveDown()
             --print 'moveDown'
-        end
+--        end
         elapsedTime = 0
     end
     
     if active == false then
         block.x, block.y = startLoc.x, startLoc.y
         game:checkLine()
-        --block = game:getRandomBlock()
+        block = game:getRandomBlock()
         active = true
     end
         
@@ -86,52 +100,17 @@ function game:draw()
 
 end
 
---[[
-function love.keypressed(key)
-    if key == 'escape' then
-        love.event.quit()
-    end
-    if key == 'down' then
-        if game:moveCheckDown() then
-            game:moveDown()
-        end
-    end
-    if key == 'left' then
-        if game:moveCheck(-1) then
-            print 'moving left'
-            game:move(-1)
-        else
-            print 'not moved'
-        end
-    end
-    if key == 'right' then
-        if game:moveCheck(1) then
-            print 'moving right'
-            game:move(1)
-        else
-            print 'not moved'
-        end
-    end
-    if key == 'up' then
-        game:rotate()
-    end
-    if key == 'space' then
-        print 'hard drop'
-        game:hardDrop()
-    end
-    
-end
---]]
-
 function game:getRandomBlock()
     num = love.math.random(#blocks)
     block = blocks[num]
-    print(block)
+    print('getRandomBlock : '..num)
+    game:setBlock()
 end
 
 function game:setBlock()
-    for i = 4, #block do
-        map[block[i].x][block[i].y].val = 1
+    for i = 1, #self.block do
+        map[map.x + block[i].x][map.y + block[i].y].val = 1
+        print('setBlock : '..map.x + block[i].x, map.y + block[i].y)
     end
 end
 
@@ -139,23 +118,22 @@ function game:moveCheck(i)
 
     print (block.x + i, block.y)
 
---    if  map[block.x + i][block.y] == nil then --check index is nil
     if block.x + i < minW or block.x + i > maxW then
         if i < 0 then
-            print 'left wall'
+            --print 'left wall'
         end
         if i > 0 then
-            print 'right wall'
+            --print 'right wall'
         end
-        print 'moveCheck false'
+        --print 'moveCheck false'
         return false
     end
     
     if map[block.x + i][block.y].val == 1 then
-        print 'moveCheck false'
+        --print 'moveCheck false'
         return false
     else
-        print 'moveCheck true'
+        --print 'moveCheck true'
         return true
     end
 
@@ -168,6 +146,28 @@ function game:move(i)
 end
 
 function game:moveCheckDown()
+    for i = 1, #self.block.x do
+    
+        for j = 1, #block.y do
+            if  map[block.x[i]][block.y[i] + 1] == nil then
+            print 'end of map'
+            active = false
+            return false
+        end
+
+        if map[block.x[i]][block.y[i] + 1].val == 1 then
+            print 'moveCheckDown false'
+            active = false
+            return false
+        else
+            print 'moveCheckDown true'
+            return true
+        end
+
+        end
+    
+    end
+--[[
     if  map[block.x][block.y + 1] == nil then
         print 'end of map'
         active = false
@@ -182,6 +182,7 @@ function game:moveCheckDown()
         print 'moveCheckDown true'
         return true
     end
+--]]
 end
 
 function game:moveDown()
