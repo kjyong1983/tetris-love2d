@@ -21,25 +21,13 @@ function love.keypressed(key)
         love.event.quit()
     end
     if key == 'down' then
-        if game:moveCheckDown() then
-            game:moveDown()
-        end
+        game:moveDown()
     end
     if key == 'left' then
-        if game:moveCheck(-1) then
-            print 'moving left'
-            game:move(-1)
-        else
-            print 'not moved'
-        end
+        game:moveSide(-1)
     end
     if key == 'right' then
-        if game:moveCheck(1) then
-            print 'moving right'
-            game:move(1)
-        else
-            print 'not moved'
-        end
+        game:moveSide(1)
     end
     if key == 'up' then
         game:rotate()

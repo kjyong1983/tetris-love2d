@@ -34,15 +34,16 @@ function game:load()
     y = {0,0,0,0,0,0}
     }
 --    blocks = {}
-    b1 = {x = -1}
-    b1 = {}
-    b2 = {}
-    b3 = {}
-    b4 = {}
-    b5 = {}
-    b6 = {}
-    blocks = {tetI}
-    tetI = {{-2,-1,0,1},{0,0,0,0}}
+    tetI = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
+    tetI.b = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
+    tetO = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetJ = {}
+    tetL = {}
+    tetS = {}
+    tetZ = {}
+    tetT = {}
+    blocks = {tetO}
+    --tetI = {{-2,-1,0,1},{0,0,0,0}}
 --[[     
    
     tetI = {{x = block.x-2, y = block.y}, {x = block.x-1, y = block.y}, {x = block.x, y = block.y}, {x = block.x+1, y = block.y}}
@@ -64,23 +65,21 @@ end
 function game:update(dt)
 
     elapsedTime = elapsedTime + dt
-    --print (elapsedTime)
     if elapsedTime > timeUnit then
         --print '1sec'
---        if game:moveCheckDown() then
---            game:moveDown()
-            --print 'moveDown'
---        end
+        --game:moveDown()
         elapsedTime = 0
     end
     
     if active == false then
-        block.x, block.y = startLoc.x, startLoc.y
+        --randomblock 1
+        --block.x[1], block.y[1] = startLoc.x, startLoc.y
+        --map[block.x[1]][block.y[1]].val = 1
+        game:getRandomBlock()
         game:checkLine()
-        block = game:getRandomBlock()
         active = true
     end
-        
+    game:draw()
 end
 
 function game:draw()
@@ -102,67 +101,176 @@ end
 
 function game:getRandomBlock()
     num = love.math.random(#blocks)
-    block = blocks[num]
+    --block = blocks[num]
     print('getRandomBlock : '..num)
-    game:setBlock()
+    game:setBlock(blocks[num])
 end
 
-function game:setBlock()
+function game:setBlock(tet)
+--[[
     for i = 1, #self.block do
         map[map.x + block[i].x][map.y + block[i].y].val = 1
         print('setBlock : '..map.x + block[i].x, map.y + block[i].y)
     end
-end
-
-function game:moveCheck(i)
-
-    print (block.x + i, block.y)
-
-    if block.x + i < minW or block.x + i > maxW then
-        if i < 0 then
-            --print 'left wall'
+    --]]
+    for i = 1,#tet.x do
+        for j = 1,#tet.y do
+            block.x[i] = startLoc.x + tet.x[i]
+            block.y[i] = startLoc.y + tet.y[i]
+            map[block.x[i]][block.y[i]].val = 1
         end
-        if i > 0 then
-            --print 'right wall'
-        end
-        --print 'moveCheck false'
-        return false
     end
     
-    if map[block.x + i][block.y].val == 1 then
-        --print 'moveCheck false'
-        return false
+end
+
+function game:moveSide(s)
+    if game:moveSideCheck(s) then
+        print ('moving side '..s)
+        game:move(s,0)
     else
-        --print 'moveCheck true'
-        return true
+        print 'not moved'
     end
+end
+
+function game:moveSideCheck(s)
+
+    --print (block.x + i, block.y)
+    if s > 0 then
+        startC = {x = #block.x, y = #block.y}
+        endC = {x = 1, y = 1}
+        iterC = -1
+    end
+    
+    if s < 0 then
+        startC = {x = 1, y = 1}
+        endC = {x = #block.x, y = #block.y}
+        iterC = 1
+    end
+    
+    
+    for i = startC.x, endC.x, iterC do
+    
+        for j = startC.y, endC.y, iterC do
+        
+            if block.x[i] + s < minW or block.x[i] + s > maxW then
+                if s < 0 then
+                    print 'left wall'
+                end
+                if s > 0 then
+                    print 'right wall'
+                end
+                    print 'moveSideCheck false by wall'
+                    return false
+            end
+                
+            if block.x[i] + s == 0 or block.y[j] == 0 then
+                    print ('zero value detected on moveSideCheck : '..i..' : '..block.x[i] ..', '..j..' : '..block.y[j])
+            else 
+                print ('check '..block.x[i] + s , block.y[j])
+                if map[block.x[i] + s][block.y[j]].val == 1 then -- 오른쪽으로 갈때 에러
+                    print 'moveSideCheck false by val is 1'
+                    return false
+                else
+                    print 'moveSideCheck true'
+                    return true
+                end
+            end
+            
+            
+        
+        
+        
+        end
+    
+    end
+    
+    
+    
 
 end
 
-function game:move(i)
-    map[block.x][block.y].val = 0
-    block.x = block.x + i
-    map[block.x][block.y].val = 1
+function game:move(a, b)
+    --needs iteration
+    
+    for j = #block.y, 1, -1 do
+
+        for i = #block.x, 1, -1 do
+        
+            if block.x[i] == 0 or block.y[j] == 0 then
+                print ('zero value detected on move : '..block.x[i]..' '..block.y[j])
+            else
+                print (block.x[i],block.y[j])
+                --print (block.x[i],block.y[j])
+                --debug.debug()
+                map[block.x[i]][block.y[j]].val = 0
+                block.x[i] = block.x[i] + a
+                block.y[j] = block.y[j] + b
+                print ('moved '..block.x[i],block.y[j])
+                
+                if block.x[i] == 0 or block.y[j] == 0 then
+                    print ('zero value detected on move')
+                else
+                    if block.x[i] < minW or block.x[i] > maxW or block.y[j] < minH or block.y[j] > maxH then
+                        print ('out of index detected : '..block.x[i]..' '..block.y[j])
+                    else
+                
+                        print('assign val '..block.x[i]..' '..block.y[j])
+                        print('val : '..map[block.x[i]][block.y[j]].val)
+                        map[block.x[i]][block.y[j]].val = 1
+                    end
+                end
+            end
+
+        end
+        
+    end
+    
+    
+    
+    
+    
+    
+    if j ~= 0 then
+        elapsedTime = 0
+    end
+    
+end
+
+function game:moveDown()
+    if game:moveCheckDown() then
+        game:move(0,1)
+        print 'moveDown'
+    end
 end
 
 function game:moveCheckDown()
-    for i = 1, #self.block.x do
+
+    for i = #block.x, 1, -1 do
     
-        for j = 1, #block.y do
-            if  map[block.x[i]][block.y[i] + 1] == nil then
+        for j = #block.y, 1, -1 do
+            --debug.debug()
+            --if  map[block.x[i]][block.y[i] + 1] == nil then
+            if block.y[i] + 1 > maxH then
             print 'end of map'
             active = false
             return false
         end
-
-        if map[block.x[i]][block.y[i] + 1].val == 1 then
-            print 'moveCheckDown false'
-            active = false
-            return false
+        
+        if block.x[i] == 0 or block.y[i] + 1 == 0 then
+            print ('zero value detected on moveCheckDown : '..i..' '..j)
         else
-            print 'moveCheckDown true'
-            return true
+        
+            if map[block.x[i]][block.y[i] + 1].val == 1 then
+                print 'moveCheckDown false'
+                active = false
+                return false
+            else
+                print 'moveCheckDown true'
+                return true
+            end
+                
         end
+        
 
         end
     
@@ -185,24 +293,25 @@ function game:moveCheckDown()
 --]]
 end
 
+--obsolete
+--[[
 function game:moveDown()
     map[block.x][block.y].val = 0
     block.y = block.y + 1
     map[block.x][block.y].val = 1
     elapsedTime = 0
 end
-
+--]]
 function game:hardDrop()
     
     for i = minH, maxH do
         if active ~= false then
-            if game:moveCheckDown() then
-                game:moveDown()
-            end
+            game:moveDown()
         else
             break
         end
     end
+    
 end
 
 function game:checkLine()
