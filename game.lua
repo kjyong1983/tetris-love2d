@@ -14,6 +14,8 @@ function game:load()
     maxW = 8
     minH = 1
     maxH = 16
+    blockLength = 4
+    math.randomseed(os.time())
     
     --coordinate
     for i = minW,maxW do
@@ -30,19 +32,49 @@ function game:load()
     
     block = 
     {
-    x = {0,0,0,0,0,0},
-    y = {0,0,0,0,0,0}
+    x = {nil,nil,nil,nil},
+    y = {nil,nil,nil,nil}
     }
-
-    tetI = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
-    tetI.b = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
-    tetO = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    --make rotated blocks
+    tetI = {}
     tetJ = {}
     tetL = {}
     tetS = {}
     tetZ = {}
     tetT = {}
-    blocks = {tetO}
+    
+    tetI.a = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
+    tetI.b = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
+    tetI.c = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
+    tetI.d = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
+    
+    tetO.a = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetO.b = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetO.c = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetO.d = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    
+    tetJ.a = {x = {-1,-1,0,1}, y = {0,1,1,1}}
+    tetJ.b = {}
+    tetJ.c = {}
+    tetJ.d = {}
+    
+    tetL.a = {x = {-1,0,1,1}, y = {1,1,1,0}}
+    tetL.b = {}
+    tetL.c = {}
+    tetL.d = {}
+    
+    tetS.a = {x = {-1,0,0,1}, y = {1,1,0,0}}
+    tetS.b = {}
+    
+    tetZ.a = {x = {-1,0,0,1}, y = {0,0,1,1}}
+    tetZ.b = {}
+    
+    tetT.a = {x = {-1,0,0,1}, y = {1,0,1,1}}
+    tetT.b = {}
+    tetT.c = {}
+    tetT.d = {}
+    
+    blocks = {tetI.a} --, tetO.a, tetJ.a, tetL.a, tetS.a, tetZ.a, tetT.a}
     
 end
 
@@ -56,6 +88,7 @@ function game:update(dt)
     end
     
     if active == false then
+        --game:blockToMap()
         game:getRandomBlock()
         game:checkLine()
         active = true
@@ -82,19 +115,20 @@ function MapDraw()
 
 end
 
+function BlockPairs()
+    local blockPairs = {}
+    for i=1, blockLength do
+        blockPairs[i] = {x=block.x[i], y=block.y[i]}
+    end
+    return blockPairs
+end
+
 function BlockDraw()
 
-    for i = 1, #block.x do
+    for i, xyPair in ipairs(BlockPairs()) do
 
-        for j = 1, #block.y do
-        
-            if block.x[i] ~= 0 and block.y[j] ~= 0 then
-        
-                love.graphics.draw(blue, i*unit, j*unit, 0, scale, scale, 0,0)
-            
-            end
-        
-        end
+        print (xyPair.x, xyPair.y)
+        love.graphics.draw(blue, xyPair.x * unit, xyPair.y * unit, 0, scale, scale, 0,0)
     
     end
 
@@ -113,7 +147,8 @@ function game:setBlock(tet)
     for i = 1,#tet.x do
         for j = 1,#tet.y do
             block.x[i] = startLoc.x + tet.x[i]
-            block.y[i] = startLoc.y + tet.y[i]
+            block.y[j] = startLoc.y + tet.y[j]
+            print (block.x[i], block.y[j])
         end
     end
     
@@ -296,8 +331,18 @@ function game:eraseLine(j)
     end    
 end
 
-function game:rotate()
+function game:rotate(tet, i)
     print 'rotate'
+    --rotate a-b-c-d
+    if i == 4 then
+        i = 0
+    end
+    tet[i] = tet[i + 1]
+    
+    --check down, if there is no space, rise block by 1 unit
+    moveCheckDown()
+    move(0,-1)
+    
 end
 
 return game
