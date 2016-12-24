@@ -15,6 +15,8 @@ function game:load()
     minH = 1
     maxH = 16
     blockLength = 4
+    curBlock = nil
+    nextBlock = nil
     math.randomseed(os.time())
     
     --coordinate
@@ -33,48 +35,55 @@ function game:load()
     block = 
     {
     x = {nil,nil,nil,nil},
-    y = {nil,nil,nil,nil}
+    y = {nil,nil,nil,nil},
+    rotation = 1
     }
+    
     --make rotated blocks
     tetI = {}
+    tetO = {}
     tetJ = {}
     tetL = {}
     tetS = {}
     tetZ = {}
     tetT = {}
     
-    tetI.a = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
-    tetI.b = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
-    tetI.c = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
-    tetI.d = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
+    tetI[1] = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
+    tetI[2] = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
+    tetI[3] = {x = {-1, 0, 1, 2}, y = {0,0,0,0}}
+    tetI[4] = {x = {0, 0, 0, 0}, y = {-2,-1,0,1}}
     
-    tetO.a = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
-    tetO.b = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
-    tetO.c = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
-    tetO.d = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetO[1] = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetO[2] = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetO[3] = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
+    tetO[4] = {x = {0, 1, 0, 1}, y = {0, 0, 1, 1}}
     
-    tetJ.a = {x = {-1,-1,0,1}, y = {0,1,1,1}}
-    tetJ.b = {}
-    tetJ.c = {}
-    tetJ.d = {}
+    tetJ[1] = {x = {-1,-1,0,1}, y = {-1,0,0,0}}
+    tetJ[2] = {x = {0,0,0,1}, y = {-1,0,1,-1}}
+    tetJ[3] = {x = {-1,0,1,1}, y = {0,0,0,1}}
+    tetJ[4] = {x = {-1,0,0,0}, y = {1,-1,0,1}}
     
-    tetL.a = {x = {-1,0,1,1}, y = {1,1,1,0}}
-    tetL.b = {}
-    tetL.c = {}
-    tetL.d = {}
+    tetL[1] = {x = {-1,0,1,1}, y = {0,0,0,-1}}
+    tetL[2] = {x = {0,0,0,1}, y = {-1,0,1,1}}
+    tetL[3] = {x = {-1,-1,0,1}, y = {1,0,0,0}}
+    tetL[4] = {x = {-1,0,0,0}, y = {-1,-1,0,1}}
     
-    tetS.a = {x = {-1,0,0,1}, y = {1,1,0,0}}
-    tetS.b = {}
+    tetS[1] = {x = {-1,0,0,1}, y = {1,1,0,0}}
+    tetS[2] = {x = {-1,-1,0,0}, y = {-1,0,0,1}}
+    tetS[3] = {x = {-1,0,0,1}, y = {1,1,0,0}}
+    tetS[4] = {x = {-1,-1,0,0}, y = {-1,0,0,1}}
     
-    tetZ.a = {x = {-1,0,0,1}, y = {0,0,1,1}}
-    tetZ.b = {}
+    tetZ[1] = {x = {-1,0,0,1}, y = {0,0,1,1}}
+    tetZ[2] = {x = {0,0,1,1}, y = {-1,0,0,1}}
+    tetZ[3] = {x = {-1,0,0,1}, y = {0,0,1,1}}
+    tetZ[4] = {x = {0,0,1,1}, y = {-1,0,0,1}}
     
-    tetT.a = {x = {-1,0,0,1}, y = {1,0,1,1}}
-    tetT.b = {}
-    tetT.c = {}
-    tetT.d = {}
+    tetT[1] = {x = {0,-1,0,1}, y = {-1,0,0,0}}
+    tetT[2] = {x = {0,0,0,1}, y = {-1,0,1,0}}
+    tetT[3] = {x = {0,-1,0,1}, y = {1,0,0,0}}
+    tetT[4] = {x = {-1,0,0,0}, y = {0,-1,0,1}}
     
-    blocks = {tetI.a} --, tetO.a, tetJ.a, tetL.a, tetS.a, tetZ.a, tetT.a}
+    blocks = {tetI, tetO, tetJ, tetL, tetS, tetZ, tetT}
     
 end
 
@@ -127,7 +136,7 @@ function BlockDraw()
 
     for i, xyPair in ipairs(BlockPairs()) do
 
-        print (xyPair.x, xyPair.y)
+        --print (xyPair.x, xyPair.y)
         love.graphics.draw(blue, xyPair.x * unit, xyPair.y * unit, 0, scale, scale, 0,0)
     
     end
@@ -139,7 +148,8 @@ end
 function game:getRandomBlock()
     num = love.math.random(#blocks)
     print('getRandomBlock : '..num)
-    game:setBlock(blocks[num])
+    game:setBlock(blocks[num][1])
+    curBlock = blocks[num]
 end
 
 function game:setBlock(tet)
@@ -148,9 +158,11 @@ function game:setBlock(tet)
         for j = 1,#tet.y do
             block.x[i] = startLoc.x + tet.x[i]
             block.y[j] = startLoc.y + tet.y[j]
-            print (block.x[i], block.y[j])
+            --print (block.x[i], block.y[j])
         end
     end
+    
+    print('setBlock end')
     
 end
 
@@ -259,7 +271,7 @@ function game:moveDown()
 end
 
 function game:moveCheckDown()
-
+--[[
     for i = #block.x, 1, -1 do
     
         for j = #block.y, 1, -1 do
@@ -281,7 +293,7 @@ function game:moveCheckDown()
         end
     
     end
-
+--]]
     
 end
 
@@ -331,17 +343,21 @@ function game:eraseLine(j)
     end    
 end
 
-function game:rotate(tet, i)
+function game:rotate(tet)
     print 'rotate'
-    --rotate a-b-c-d
-    if i == 4 then
-        i = 0
+
+    if block.rotation == 4 then
+        block.rotation = 0
     end
-    tet[i] = tet[i + 1]
     
+    block.rotation = block.rotation + 1
+    print('debug')
+    
+    game:setBlock(curBlock[block.rotation])
+
     --check down, if there is no space, rise block by 1 unit
-    moveCheckDown()
-    move(0,-1)
+    --moveCheckDown()
+    --move(0,-1)
     
 end
 

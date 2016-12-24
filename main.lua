@@ -30,11 +30,14 @@ function love.keypressed(key)
         game:moveSide(1)
     end
     if key == 'up' then
-        game:rotate()
+        game:rotate(game.block)
     end
     if key == 'space' then
         print 'hard drop'
         game:hardDrop()
+    end
+    if key == 'r' then
+        game:getRandomBlock()
     end
     
 end
