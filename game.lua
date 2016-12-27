@@ -24,6 +24,7 @@ function game:load()
         map[i] = {}
         for j = minH,maxH do
             map[i][j] = {}
+            map.val = false
         end
     end
     
@@ -119,7 +120,14 @@ function MapDraw()
 
     for i = minW,maxW do
         for j = minH,maxH do        
-                love.graphics.draw(white, i*unit, j*unit, 0, scale, scale,0,0)
+        
+            if map[i][j].val == true then
+                love.graphics.draw(pink, i*unit, j*unit, 0, scale, scale,0,0)
+            else
+            
+            love.graphics.draw(white, i*unit, j*unit, 0, scale, scale,0,0)
+            
+            end
         end        
     end
 
@@ -338,6 +346,31 @@ function game:moveCheckDown()
 --]]
     
     --check block down
+    for i = blockLength, 1, -1 do
+    
+        --end of map check
+    
+        if block.y[i] + 1 > maxH then
+            print 'end of map'
+            game:blockToMap()
+            active = false
+            return false
+            
+        end
+        
+        --check blocks in map
+        
+        if map[block.x[i]][block.y[i] + 1].val == true then
+            game:blockToMap()
+            active = false
+            return false
+        end
+        
+    
+    end
+    
+    
+    
     
     --map
     return true
@@ -355,6 +388,16 @@ function game:hardDrop()
         end
     end
     
+end
+
+function game:blockToMap()
+
+    for i = 1, blockLength do
+    
+        map[block.x[i]][block.y[i]].val = true
+    
+    end
+
 end
 
 function game:checkLine()
