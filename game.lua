@@ -28,6 +28,7 @@ function game:load()
     end
     
     startLoc = {x = 4, y = 1}
+    curLoc = { x = nil, y = nil}
     active = false
     
     --set all elements of block.x, block.y to nil, set value to 0 when SetBlock() is called
@@ -148,16 +149,27 @@ end
 function game:getRandomBlock()
     num = love.math.random(#blocks)
     print('getRandomBlock : '..num)
-    game:setBlock(blocks[num][1])
     curBlock = blocks[num]
+    curLoc.x = startLoc.x
+    curLoc.y = startLoc.y
+    print('curLoc'..curLoc.x..' '..curLoc.y)
+    game:setBlock(blocks[num][1])
+    
 end
 
 function game:setBlock(tet)
 
     for i = 1,#tet.x do
         for j = 1,#tet.y do
-            block.x[i] = startLoc.x + tet.x[i]
-            block.y[j] = startLoc.y + tet.y[j]
+            print('b ')
+            print(block.x[i])
+            print('c ')
+            print(curLoc.x)
+            print('t ')
+            print(tet.x[i])
+            
+            block.x[i] = curLoc.x + tet.x[i]
+            block.y[j] = curLoc.y + tet.y[j]
             --print (block.x[i], block.y[j])
         end
     end
@@ -178,19 +190,20 @@ end
 function game:moveSideCheck(s)
 
     --print (block.x + i, block.y)
+    
     if s > 0 then
-        startC = {x = #block.x, y = #block.y}
-        endC = {x = 1, y = 1}
+        startC = blockLength
+        endC = 1
         iterC = -1
     end
     
     if s < 0 then
-        startC = {x = 1, y = 1}
-        endC = {x = #block.x, y = #block.y}
+        startC = 1
+        endC = blockLength
         iterC = 1
     end
     
-    
+    --[[
     for i = startC.x, endC.x, iterC do
     
         for j = startC.y, endC.y, iterC do
@@ -220,7 +233,24 @@ function game:moveSideCheck(s)
         end
     
     end
+    --]]
     
+    
+    
+    for i = startC, endC, iterC do
+    
+        if block.x[i] + s < minW or block.x[i] + s > maxW then
+            
+            return false
+            
+        end
+        
+        
+        
+        return true
+        
+    
+    end
     
     
 
@@ -228,7 +258,7 @@ end
 
 function game:move(a, b)
     --needs iteration
-    
+--[[
     for j = #block.y, 1, -1 do
 
         for i = #block.x, 1, -1 do
@@ -256,7 +286,19 @@ function game:move(a, b)
         
     end
     
+--]]
+
+     for i = 1, blockLength do
+        
+            block.x[i] = block.x[i] + a
+            block.y[i] = block.y[i] + b
     
+    end
+    
+    curLoc.x = curLoc.x + a
+    curLoc.y = curLoc.y + b
+    
+
     if j ~= 0 then
         elapsedTime = 0
     end
@@ -294,6 +336,12 @@ function game:moveCheckDown()
     
     end
 --]]
+    
+    --check block down
+    
+    --map
+    return true
+    
     
 end
 
