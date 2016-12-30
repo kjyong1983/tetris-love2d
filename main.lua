@@ -39,6 +39,9 @@ function love.keypressed(key)
     if key == 'r' then
         game:getRandomBlock()
     end
+    if key == 't' then
+        game:load()
+    end
     
 end
 

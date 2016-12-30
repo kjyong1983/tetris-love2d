@@ -105,6 +105,12 @@ function game:update(dt)
         game:checkLine()
         active = true
     end
+    
+    if map[startLoc.x][startLoc.y].val == true then
+        print 'game over'
+        --active = 
+    end
+    
     game:draw()
 end
 
@@ -172,13 +178,14 @@ function game:setBlock(tet)
 
     for i = 1,#tet.x do
         for j = 1,#tet.y do
+            --[[
             print('b ')
             print(block.x[i])
             print('c ')
             print(curLoc.x)
             print('t ')
             print(tet.x[i])
-            
+            --]]
             block.x[i] = curLoc.x + tet.x[i]
             block.y[j] = curLoc.y + tet.y[j]
             --print (block.x[i], block.y[j])
@@ -266,7 +273,7 @@ function game:move(a, b)
     curLoc.y = curLoc.y + b
     
 
-    if j ~= 0 then
+    if b ~= 0 then
         elapsedTime = 0
     end
     
@@ -383,6 +390,23 @@ function game:eraseLine(j)
     
 end
 
+function game:rotateCheck()
+
+    for i = 1, blockLength do
+    
+        if map[block.x[i]][block.y[i]].val == true then
+            block.rotation = block.rotation - 1
+        return false
+        end
+
+    end
+
+
+
+    return true
+
+end
+
 function game:rotate(tet)
     print 'rotate'
 
@@ -393,8 +417,11 @@ function game:rotate(tet)
     block.rotation = block.rotation + 1
     print('debug')
     
-    game:setBlock(curBlock[block.rotation])
-
+    if game:rotateCheck() then
+        game:setBlock(curBlock[block.rotation])
+    end
+    
+    
     --check down, if there is no space, rise block by 1 unit
     -- not good at below
     if not game:moveCheckDown() then
