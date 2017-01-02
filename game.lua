@@ -11,6 +11,8 @@ function game:load()
     map = {}
     elapsedTime = 0
     timeUnit = 1
+    difficulty = 1
+    difficultyUnit = 1
     minW = 1
     maxW = 8
     minH = 1
@@ -19,6 +21,7 @@ function game:load()
     curBlock = nil
     nextBlock = nil
     score = 0
+    gameOver = false
     math.randomseed(os.time())
     
     --coordinate
@@ -100,25 +103,35 @@ end
 function game:update(dt)
 
     elapsedTime = elapsedTime + dt
-    if elapsedTime > timeUnit then
+    if elapsedTime > difficulty/timeUnit and gameOver == false then
         print '1sec'
         game:moveDown()
         elapsedTime = 0
     end
     
-    if active == false then
+    if active == false and gameOver == false then
         --game:blockToMap()
         game:getRandomBlock()
         game:checkLine()
+
+        if score / 5 > difficultyUnit then
+            difficulty = difficulty * 0.8
+            difficultyUnit = difficultyUnit + 1
+            print ('difficulty '.. difficulty)
+        end
+
         active = true
     end
     
     if map[startLoc.x][startLoc.y].val == true then
         print 'game over'
-        --active = 
+        active = true
+        gameOver = true
     end
     
+    
     game:draw()
+    
 end
 
 function game:draw()
@@ -130,7 +143,13 @@ function game:draw()
         love.graphics.draw(black, i * unit, 0, 0, scale, scale, 0, 0)
     end
     
-    love.graphics.print('score : '..score, 300,100,0,1,1)
+    love.graphics.print('score : '..score, 350,50,0,1,1)
+    
+    if gameOver == true then
+        game:GameOverDraw()
+    end
+    
+
     
 end
 
@@ -153,6 +172,14 @@ function MapDraw()
     
 end
 
+function game:GameOverDraw()
+    
+    love.graphics.print('G A M E', 300, 200, 0, 3, 3)
+    love.graphics.print('O V E R', 300, 250, 0, 3, 3)
+    love.graphics.print('Press R to Restart', 310, 300, 0, 1, 1)
+    
+end
+
 function BlockPairs()
     local blockPairs = {}
     for i=1, blockLength do
@@ -164,10 +191,14 @@ end
 function BlockDraw()
 
     for i, xyPair in ipairs(BlockPairs()) do
-
+        
+        if gameOver == true then
+            love.graphics.draw(pink, xyPair.x * unit, xyPair.y * unit, 0, scale, scale, 0,0)
+        else
         --print (xyPair.x, xyPair.y)
         love.graphics.draw(blue, xyPair.x * unit, xyPair.y * unit, 0, scale, scale, 0,0)
-    
+        
+        end
     end
 
 
@@ -381,6 +412,10 @@ function game:eraseLine(j)
         end
     end  
     
+end
+
+function game:addScore()
+    score = score + 1
 end
 
 function game:rotateCheck()

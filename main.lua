@@ -37,12 +37,16 @@ function love.keypressed(key)
         game:hardDrop()
     end
     if key == 'r' then
-        game:getRandomBlock()
-    end
-    if key == 't' then
         game:load()
     end
-    
+--[[
+    if key == 't' then
+        game:getRandomBlock()
+    end
+    if key == 's' then
+        game:addScore()
+    end
+--]]
 end
 
 
