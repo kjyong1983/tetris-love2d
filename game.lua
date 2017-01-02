@@ -246,13 +246,7 @@ function game:moveSideCheck(s)
 
             end
         )
-        
-        
-        
-        
-        
-        
-        
+                
         return true
         
     
@@ -319,12 +313,7 @@ function game:moveCheckDown()
         end
         )
         
-        
-    
     end
-    
-    
-    
     
     --map
     return true
@@ -405,9 +394,6 @@ function game:rotateCheck()
             return false
         end
         
---        asdfasd = tempBlock.y[i]
-  --      asefaewf = map[tempBlock.x[i]][tempBlock.y[i]]
-
         if map[tempBlock.y[i]] == nil or not map[tempBlock.y[i]] then
             block.rotation = block.rotation - 1
             return false
@@ -437,27 +423,13 @@ function game:rotate(tet)
     block.rotation = block.rotation + 1
     print('debug')
     
---    if pcall(game:rotateCheck()) then
     if game:rotateCheck() then
            game:setBlock(curBlock[block.rotation], block)
     end
     
-    
     --check down, if there is no space, rise block by 1 unit
-    -- not good at below
     
     game:blockLocationCheck()
-    --[[
-    if not game:moveCheckDown() then
-        game:move(0,-1)
-    end
-    if not game:moveSideCheck(1) then
-        game:move(-1,0)
-    end
-    if not game:moveSideCheck(-1) then
-        game:move(1,0)
-    end
-    --]]
     
 end
 
