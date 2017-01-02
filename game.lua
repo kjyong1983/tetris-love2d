@@ -18,6 +18,7 @@ function game:load()
     blockLength = 4
     curBlock = nil
     nextBlock = nil
+    score = 0
     math.randomseed(os.time())
     
     --coordinate
@@ -40,6 +41,12 @@ function game:load()
     x = {nil,nil,nil,nil},
     y = {nil,nil,nil,nil},
     rotation = 1
+    }
+    
+    tempBlock =
+    {
+    x = {nil,nil,nil,nil},
+    y = {nil,nil,nil,nil}
     }
     
     --make rotated blocks
@@ -77,9 +84,9 @@ function game:load()
     tetS[4] = {x = {-1,-1,0,0}, y = {-1,0,0,1}}
     
     tetZ[1] = {x = {-1,0,0,1}, y = {0,0,1,1}}
-    tetZ[2] = {x = {0,0,1,1}, y = {-1,0,0,1}}
+    tetZ[2] = {x = {0,0,1,1}, y = {1,0,0,-1}}
     tetZ[3] = {x = {-1,0,0,1}, y = {0,0,1,1}}
-    tetZ[4] = {x = {0,0,1,1}, y = {-1,0,0,1}}
+    tetZ[4] = {x = {0,0,1,1}, y = {1,0,0,-1}}
     
     tetT[1] = {x = {0,-1,0,1}, y = {-1,0,0,0}}
     tetT[2] = {x = {0,0,0,1}, y = {-1,0,1,0}}
@@ -120,9 +127,11 @@ function game:draw()
     BlockDraw()
     
     for i = minW, maxW do
-        love.graphics.draw(black, i * unit, 50, scale, scale, 0, 0)
+        love.graphics.draw(black, i * unit, 0, 0, scale, scale, 0, 0)
     end
-
+    
+    love.graphics.print('score : '..score, 300,100,0,1,1)
+    
 end
 
 function MapDraw()
@@ -137,9 +146,11 @@ function MapDraw()
             love.graphics.draw(white, i*unit, j*unit, 0, scale, scale,0,0)
             
             end
-        end        
+            
+        end
     end
 
+    
 end
 
 function BlockPairs()
@@ -170,22 +181,14 @@ function game:getRandomBlock()
     curLoc.x = startLoc.x
     curLoc.y = startLoc.y
     print('curLoc'..curLoc.x..' '..curLoc.y)
-    game:setBlock(blocks[num][1])
+    game:setBlock(blocks[num][1], block)
     
 end
 
-function game:setBlock(tet)
+function game:setBlock(tet, block)
 
     for i = 1,#tet.x do
         for j = 1,#tet.y do
-            --[[
-            print('b ')
-            print(block.x[i])
-            print('c ')
-            print(curLoc.x)
-            print('t ')
-            print(tet.x[i])
-            --]]
             block.x[i] = curLoc.x + tet.x[i]
             block.y[j] = curLoc.y + tet.y[j]
             --print (block.x[i], block.y[j])
@@ -366,8 +369,9 @@ function game:checkLine()
 
         end
         
-        if check == maxW then
+        if check ~= 0 and check % maxW == 0 then
             game:eraseLine(j)
+            score = score + 1
         else
             check = 0
         end
@@ -392,16 +396,32 @@ end
 
 function game:rotateCheck()
 
+    game:setBlock(curBlock[block.rotation], tempBlock)
+
     for i = 1, blockLength do
     
-        if map[block.x[i]][block.y[i]].val == true then
+        if map[tempBlock.x[i]] == nil or not map[tempBlock.x[i]] then
             block.rotation = block.rotation - 1
-        return false
+            return false
+        end
+        
+--        asdfasd = tempBlock.y[i]
+  --      asefaewf = map[tempBlock.x[i]][tempBlock.y[i]]
+
+        if map[tempBlock.y[i]] == nil or not map[tempBlock.y[i]] then
+            block.rotation = block.rotation - 1
+            return false
+        end
+  
+  
+        if map[tempBlock.x[i]][tempBlock.y[i]].val == true then
+            block.rotation = block.rotation - 1
+            print 'rotateCheck failed'
+            return false
+    
         end
 
     end
-
-
 
     return true
 
@@ -417,13 +437,17 @@ function game:rotate(tet)
     block.rotation = block.rotation + 1
     print('debug')
     
+--    if pcall(game:rotateCheck()) then
     if game:rotateCheck() then
-        game:setBlock(curBlock[block.rotation])
+           game:setBlock(curBlock[block.rotation], block)
     end
     
     
     --check down, if there is no space, rise block by 1 unit
     -- not good at below
+    
+    game:blockLocationCheck()
+    --[[
     if not game:moveCheckDown() then
         game:move(0,-1)
     end
@@ -433,7 +457,37 @@ function game:rotate(tet)
     if not game:moveSideCheck(-1) then
         game:move(1,0)
     end
+    --]]
     
+end
+
+function game:blockLocationCheck()
+
+    for i = 1, blockLength do
+    
+        if block.x[i] < minW then
+            game:move(1,0)
+            game:blockLocationCheck()
+        end
+        
+        if block.x[i] > maxW then
+            game:move(-1,0)
+            game:blockLocationCheck()
+        end
+        
+        if block.y[i] < minH then
+            game:move(0,1)
+            game:blockLocationCheck()
+        end
+        
+        if block.y[i] > maxH then
+            game:move(0,-1)
+            game:blockLocationCheck()
+        end
+        
+        
+    end
+
 end
 
 return game
