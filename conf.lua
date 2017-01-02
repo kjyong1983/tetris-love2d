@@ -4,6 +4,6 @@ function love.conf(t)
     t.window.title = 'test'
     t.window.width = 500
     t.window.height = 550
-    t.console = true
+    t.console = false
     
 end

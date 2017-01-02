@@ -22,6 +22,11 @@ function game:load()
     nextBlock = nil
     score = 0
     gameOver = false
+    pitch = 1.0
+    music = love.audio.newSource("t.ogg")
+    music:setVolume(1.0)
+    music:setPitch(pitch)
+    music:play()
     math.randomseed(os.time())
     
     --coordinate
@@ -117,6 +122,11 @@ function game:update(dt)
         if score / 5 > difficultyUnit then
             difficulty = difficulty * 0.8
             difficultyUnit = difficultyUnit + 1
+            
+            if score > 20 then
+                pitch = pitch + 0.1
+                music:setPitch(pitch)
+            end
             print ('difficulty '.. difficulty)
         end
 
@@ -127,6 +137,7 @@ function game:update(dt)
         print 'game over'
         active = true
         gameOver = true
+        love.audio.stop()
     end
     
     
